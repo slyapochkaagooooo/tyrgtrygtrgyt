@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оружейный Магазин</title>
+
+    <!-- Встроенные стили CSS -->
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        header {
+            background-color: #2d2d2d;
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            padding: 0;
+        }
+        nav ul li {
+            margin-right: 20px;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .hero {
+            background: url('hero-image.jpg') center/cover no-repeat;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 48px;
+            color: #000000;
+        }
+        .container {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 15px;
+        }
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .card h2 {
+            margin: 15px 0;
+            font-size: 22px;
+        }
+        .card p {
+            margin: 10px 0;
+            font-size: 14px;
+            color: #666;
+            text-align: justify;
+        }
+        .card .price {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 18px;
+            color: #2d2d2d;
+        }
+        .card .add-to-cart, .card .buy-now {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .card .add-to-cart:hover, .card .buy-now:hover {
+            background-color: #45a049;
+        }
+        .card .buy-now {
+            background-color: #2196F3;
+        }
+        .card .buy-now:hover {
+            background-color: #1976D2;
+        }
+        .cart {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        footer {
+            background-color: #2d2d2d;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+        }
+        .cart-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .cart-popup.active {
+            display: flex;
+        }
+        .cart-popup h2 {
+            margin-bottom: 20px;
+        }
+        .cart-popup ul {
+            list-style: none;
+            padding: 0;
+        }
+        .cart-popup li {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .cart-popup .total-price {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        .cart-popup .close-cart {
+            background-color: red;
+            padding: 10px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .cart-popup .buy-all {
+            background-color: #FF5733;
+            padding: 10px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .cart-popup .buy-all:hover {
+            background-color: #C70039;
+        }
+
+        /* Стиль для формы оформления заказа */
+        .order-form {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+        .order-form input,
+        .order-form button {
+            margin: 10px;
+            padding: 10px;
+            width: 300px;
+        }
+        .order-form button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .order-form button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Оружейный Магазин</div>
+        <nav>
+            <ul>
+                <li><a href="#home">Главная</a></li>
+                <li><a href="#catalog">Каталог</a></li>
+                <li><a href="#contact">Контакты</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <h1>Добро пожаловать в наш оружейный магазин</h1>
+    </div>
+
+    <div class="container" id="catalog">
+        <!-- Пример карточки товара -->
+        <div class="card" data-name="ПМ (Пистолет Макарова)" data-price="15645">
+            <img src="https://avatars.mds.yandex.net/i?id=8a7f5ade40119f67df4407446504b8e4_l-10702304-images-thumbs&n=13" alt="ПМ (Пистолет Макарова)">
+            <h2>ПМ (Пистолет Макарова)</h2>
+            <p>Описание: один из самых известных советских пистолетов. Используется в армии и полиции многих стран.</p>
+            <div class="price">Цена: 15,645 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+        <!-- Повторите блок для каждого товара -->
+        <div class="card" data-name="ПП (Пистолет-пулемёт)" data-price="65000">
+            <img src="https://pnevmat24.ru/image/catalog/products/20529/oholoshchennyy-shp-pistolet-pulemet-spp-93-ten-14-pp-93-sh-10x24-4.jpg" alt="ПП (Пистолет-пулемёт)">
+            <h2>ПП (Пистолет-пулемёт)</h2>
+            <p>Описание: оружие для автоматического огня, но в отличие от пистолетов, может использовать более высокую скорость стрельбы.</p>
+            <div class="price">Цена: 65,000 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+        <div class="card" data-name="Вальтер (Walther)" data-price="13090">
+            <img src="https://i.pinimg.com/originals/21/55/77/2155772e1eb2abc9c6599d7446ce2b8b.jpg" alt="Вальтер (Walther)">
+            <h2>Вальтер (Walther)</h2>
+            <p>Описание: широко используется в спортивной стрельбе.</p>
+            <div class="price">Цена: 13,090 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+        <div class="card" data-name="Смит и Вессон (Smith & Wesson)" data-price="39990">
+            <img src="https://avatars.mds.yandex.net/i?id=be0f4d604ef6ad3f0d3e8cc071064709_l-5232506-images-thumbs&n=13" alt="Смит и Вессон (Smith & Wesson)">
+            <h2>Смит и Вессон (Smith & Wesson)</h2>
+            <p>Описание: популярные пистолеты для соревнований по стрельбе.</p>
+            <div class="price">Цена: 39,990 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+        <div class="card" data-name="Glock (Глок)" data-price="16990">
+            <img src="https://avatars.mds.yandex.net/get-mpic/1673800/img_id1469566508617294631.jpeg/orig" alt="Glock (Глок)">
+            <h2>Glock (Глок)</h2>
+            <p>Описание: один из самых популярных пистолетов среди гражданских владельцев.</p>
+            <div class="price">Цена: 16,990 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+        <div class="card" data-name="SIG Sauer" data-price="30450">
+            <img src="http://www.dogswar.ru/images/stories/pistolet2/P226-Mk25-04.jpg" alt="SIG Sauer">
+            <h2>SIG Sauer</h2>
+            <p>Описание: немецкий производитель, известен своими пистолетами для гражданского оборота.</p>
+            <div class="price">Цена: 30,450 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+        <div class="card" data-name="Револьвер Р1" data-price="24900" >
+            <img src="https://i3.guns.ru/forums/icons/forum_pictures/029763/29763281_10447.jpg" alt="Револьвер Р1">
+            <h2>Револьвер Р1</h2>
+            <p>Описание: в советское время использовался в МВД и других силах правопорядка.</p>
+            <div class="price">Цена: 24,900 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            </div>
+
+        <div class="card" data-name="ТТ (Тульский Токарев)" data-price="65990">
+            <img src="https://www.rostov.pnevmachi.ru/upload/iblock/936/9362431f5fd154d414fa2a507b36f25e.jpg" alt="ТТ (Тульский Токарев)">
+            <h2>ТТ (Тульский Токарев)</h2>
+            <p>Описание: также используется для самообороны и в качестве спортивного оружия.</p>
+            <div class="price">Цена: 65,990 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+          
+        </div>
+
+        <div class="card" data-name="Калашников (АК-47)" data-price="9834">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/65/AK-47_type_II_noBG.png" alt="Калашников (АК-47)">
+            <h2>Калашников (АК-47)</h2>
+            <p>Описание: автоматика, использующаяся в армии.</p>
+            <div class="price">Цена: 9834 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+        <div class="card" data-name="СВД (Снайперская винтовка Драгунова)" data-price="91670">
+            <img src="https://a.d-cd.net/7f26aa9s-960.jpg" alt="СВД (Снайперская винтовка Драгунова)">
+            <h2>СВД (Снайперская винтовка Драгунова)</h2>
+            <p>Описание: используется для дальнобойной стрельбы.</p>
+            <div class="price">Цена: 91,670 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+     
+        <div class="card" data-name="M16/M4" data-price="16990">
+            <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/74c27c71-6b77-4fdf-9e03-af1ffc407220/d9wxfgr-4cc4b4df-b079-4d45-b95d-026d33e0b458.jpg/v1/fill/w_830,h_680,q_75,strp/colt_m16a4_and_m4a1___cqb_by_strat0sz3r0_d9wxfgr-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NjgwIiwicGF0aCI6IlwvZlwvNzRjMjdjNzEtNmI3Ny00ZmRmLTllMDMtYWYxZmZjNDA3MjIwXC9kOXd4ZmdyLTRjYzRiNGRmLWIwNzktNGQ0NS1iOTVkLTAyNmQzM2UwYjQ1OC5qcGciLCJ3aWR0aCI6Ijw9ODMwIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.FApsKDt6FVgTCYdYACjJ-YL-Gua3UQHuhabNHeflfkM" alt="M16/M4">
+            <h2>M16/M4</h2>
+            <p>Описание: американская винтовка, используемая в армии США и других странах.</p>
+            <div class="price">Цена: 16,990 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+        <div class="card" data-name="ТОЗ-34" data-price="54375">
+            <img src="https://www.huntworld.ru/upload/iblock/75a/ruzhe_toz_34_er_orekh.jpeg" alt="ТОЗ-34">
+            <h2>ТОЗ-34</h2>
+            <p>Описание: популярное охотничье ружьё.</p>
+            <div class="price">Цена: 54,375 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+        <div class="card" data-name="АК-74" data-price="35000">
+            <img src="https://gun.deals/sites/default/files/Zastava-USA-ZPAP-M70-Battle-Worn-ZR7762BTW-685757098649.jpg" alt="АК-74">
+            <h2>АК-74</h2>
+            <p>Описание: усовершенствованная версия АК-47, применяется в армии.</p>
+            <div class="price">Цена: 35,000 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+        <div class="card" data-name="ИЖ-27" data-price="15000">
+            <img src="https://ordom.ru/upload/iblock/685/685d1edea76fb9f0769867c43353b8c0.JPG" alt="ИЖ-27">
+            <h2>ИЖ-27</h2>
+            <p>Описание: российский вариант двуствольного охотничьего дробовика.</p>
+            <div class="price">Цена: 15,000 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+           
+        </div>
+
+        
+        <div class="card" data-name="Dragunov SVD" data-price="46490">
+            <img src="https://a.d-cd.net/7f26aa9s-960.jpg" alt="Dragunov SVD">
+            <h2>Dragunov SVD</h2>
+            <p>Описание: российская снайперская винтовка.</p>
+            <div class="price">Цена: 46,490 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+        
+        <div class="card" data-name="Охотничьи ножи" data-price="3000">
+            <img src="https://klinok-bulat.ru/wa-data/public/shop/products/17/14/1417/images/8427/8427.750x0.jpg" alt="Охотничьи ножи">
+            <h2>Охотничьи ножи</h2>
+            <p>Описание: ножи, предназначенные для использования в походах, на охоте и рыбалке. Обычно они обладают прочным лезвием и удобной рукоятью для работы в экстремальных условиях.</p>
+            <div class="price">Цена: 2999-9888 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+       
+        <div class="card" data-name="Тактические ножи" data-price="4000">
+            <img src="https://kknife.ru/wa-data/public/shop/products/40/31/3140/images/54159/54159.2560x0.jpg" alt="Тактические ножи">
+            <h2>Тактические ножи</h2>
+            <p>Описание: Обычно они имеют прочную конструкцию и могут быть использованы для различных целей в экстремальных ситуациях.</p>
+            <div class="price">Цена: 4000-14,000 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+       
+        <div class="card" data-name="Боевые ножи" data-price="4000">
+            <img src="https://i.pinimg.com/originals/b8/a1/80/b8a1806569796f6b79edcf0a1453a3d5.jpg" alt="Боевые ножи">
+            <h2>Боевые ножи</h2>
+            <p>Описание: Они часто имеют специальную форму и конструкцию, чтобы эффективно использоваться в бою.</p>
+            <div class="price">Цена: 3000-9888 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+        
+        <div class="card" data-name="Ножи для выживания" data-price="6000">
+            <img src="https://avatars.dzeninfra.ru/get-zen_doc/1583807/pub_612a34f44b943d646e74595e_612ac4543e355f506acf169e/scale_1200" alt="Ножи для выживания">
+            <h2>Ножи для выживания</h2>
+            <p>Описание: Эти ножи обладают прочными и долговечными лезвиями, которые могут быть использованы для рубки, нарезки и других задач в экстремальных условиях.</p>
+            <div class="price">Цена: 2000-11,000 ₽</div>
+            <button class="add-to-cart">Добавить в корзину</button>
+            
+        </div>
+
+    </div>
+
+    <div class="cart" id="cartButton">
+        Корзина (0)
+    </div>
+
+    <!-- Окно корзины -->
+    <div class="cart-popup" id="cartPopup">
+        <h2>Ваша корзина</h2>
+        <ul id="cartList"></ul>
+        <div class="total-price">Итого: 0 ₽</div>
+          <button class="buy-all" onclick="window.location.href='order-page.html';">Купить все</button>
+        <button class="close-cart">Закрыть</button>
+    </div>
+
+   
+
+    <footer>
+        <p>&copy; 2024 Оружейный Магазин</p>
+    </footer>
+
+    <script>
+        // Корзина и добавление товаров
+        let cart = [];
+        const cartButton = document.getElementById('cartButton');
+        const cartPopup = document.getElementById('cartPopup');
+        const cartList = document.getElementById('cartList');
+        const buyAllButton = document.querySelector('.buy-all');
+        const closeCartButton = document.querySelector('.close-cart');
+        const orderForm = document.getElementById('orderForm');
+        const submitOrderButton = document.getElementById('submitOrder');
+        
+        // Функция для обновления корзины
+        function updateCart() {
+            const cartCount = cart.length;
+            cartButton.textContent = `Корзина (${cartCount})`;
+
+            // Обновляем список товаров в корзине
+            cartList.innerHTML = '';
+            let total = 0;
+            cart.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = `${item.name} - ${item.price} ₽`;
+                cartList.appendChild(li);
+                total += item.price;
+            });
+
+            document.querySelector('.total-price').textContent = `Итого: ${total} ₽`;
+        }
+
+        // Обработчик добавления товаров в корзину
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const card = e.target.closest('.card');
+                const name = card.getAttribute('data-name');
+                const price = parseInt(card.getAttribute('data-price'), 10);
+
+                cart.push({ name, price });
+                updateCart();
+            });
+        });
+
+        // Открытие корзины
+        cartButton.addEventListener('click', () => {
+            cartPopup.classList.add('active');
+        });
+
+        // Закрытие корзины
+        closeCartButton.addEventListener('click', () => {
+            cartPopup.classList.remove('active');
+        });
+
+        
+
+       
+    </script>
+
+</body>
+</html>
